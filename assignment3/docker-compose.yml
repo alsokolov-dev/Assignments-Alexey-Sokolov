@@ -1,0 +1,52 @@
+version: '2'
+
+services:
+  nginx:
+    image: dydx/alpine-nginx-phpfpm
+    ports:
+      - "80:80"
+    volumes:
+      - ./www:/var/www
+      - ./sites:/etc/nginx/sites-enabled
+    links:  
+      - mysql:mysql
+    networks:
+      - front-tier
+      - back-tier
+      
+
+  artisan:
+    image: spiralout/dartisan
+    volumes:
+      - ./www:/var/www
+    links:
+      - mysql:mysql
+    networks:
+      - front-tier
+      - back-tier
+
+  mysql:
+    image: spiralout/alpine-mariadb
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./database:/var/lib/mysql
+    networks:
+      - back-tier
+
+  composer:  
+    image: spiralout/dcomposer
+    volumes:
+      - ./www:/var/www
+    networks:
+      - back-tier
+
+volumes:
+  www:
+  sites:
+  redis-data:
+
+networks:
+  front-tier:
+  back-tier:
+  
